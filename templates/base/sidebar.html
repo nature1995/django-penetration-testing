@@ -1,0 +1,141 @@
+<div class="left_col scroll-view">
+    <div class="navbar nav_title" style="border: 0;">
+        <a href="/" class="site_title"><i class="fa fa-star"></i> <span>Penetration Test</span></a>
+    </div>
+
+    <div class="clearfix"></div>
+
+    <!-- menu profile quick info -->
+    <div class="profile clearfix">
+        <div class="profile_pic">
+            <img src="/static/images/img.jpg" alt="..." class="img-circle profile_img">
+        </div>
+        <div class="profile_info">
+            <span>Welcome,</span>
+            <h2>{{ request.user.username }}</h2>
+        </div>
+    </div>
+    <!-- /menu profile quick info -->
+
+    <br/>
+
+    <!-- sidebar menu -->
+    <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
+        <div class="menu_section">
+            <h3>General</h3>
+            <ul class="nav side-menu">
+                <li><a><i class="fa fa-home"></i> Home <span class="fa fa-chevron-down"></span></a>
+                    <ul class="nav child_menu">
+                        <li><a href="{% url 'index' %}"> Home </a></li>
+                    </ul>
+                </li>
+                <li><a><i class="fa fa-cubes"></i> Penetration test <span class="fa fa-chevron-down"></span></a>
+                    <ul class="nav child_menu">
+                        <li><a href="{% url 'who_is' %}"> Domain name information </a>
+                        <li><a href="{% url 'subdomain_scan' %}"> Second-level domain name </a>
+                        <li><a href="{% url 'port_scan' %}"> Port scan</a>
+                        <li><a href="{% url 'ip_blacklist' %}"> Blacklist IP collection </a>
+                        <li><a href="{% url 'identify_web' %}"> Fingerprint collection </a>
+                            {#                        <li><a href="{% url 'web_log' %}">web日志</a>#}
+                        </li>
+                    </ul>
+                </li>
+                <li><a><i class="fa fa-bars"></i> Cloud <span class="fa fa-chevron-down"></span></a>
+                    <ul class="nav child_menu">
+                        <li><a href="{% url 'who_is' %}">AWS</a>
+                            {#                        <li><a href="{% url 'subdomain_scan' %}">二级域名收集</a>#}
+                            {#                        <li><a href="{% url 'port_scan' %}">端口信息收集</a>#}
+                            {#                        <li><a href="{% url 'identify_web' %}">指纹收集</a>#}
+                            {#                        <li><a href="{% url 'web_log' %}">web日志</a>#}
+                        </li>
+                    </ul>
+                </li>
+                <li><a><i class="fa fa-anchor"></i> Project<span class="fa fa-chevron-down"></span></a>
+                    <ul class="nav child_menu">
+
+{#                                                        <ul class="nav child_menu">#}
+{#                                                            <li class="sub_menu" style="display: none"><a#}
+{#                                                                    href="{% url 'project_add' %}"></a>#}
+{#                                                            </li>#}
+{#                                                        </ul>#}
+{#                                                    <li><a href="{% url 'code_deploy_list' %}">发布项目</a>#}
+{#                                                        <ul class="nav child_menu">#}
+{#                                                            <li class="sub_menu" style="display: none"><a#}
+{#                                                                    href="{% url 'code_deploy_add' %}"></a>#}
+{#                                                            </li>#}
+{#                                                        </ul>#}
+{#                                                    <li><a href="{% url 'jenkins_list' %}">Jenkins管理</a>#}
+{#                                                    </li>#}
+                    </ul>
+                </li>
+                {#                <li><a><i class="fa fa-database"></i> 数据库管理 <span class="fa fa-chevron-down"></span></a>#}
+                {#                    <ul class="nav child_menu">#}
+                {#                        <li><a href="{% url 'database_list' %}">数据库列表</a>#}
+                {#                            <ul class="nav child_menu">#}
+                {#                                <li class="sub_menu" style="display: none"><a#}
+                {#                                        href="{% url 'db_add' %}"></a>#}
+                {#                                </li>#}
+                {#                            </ul>#}
+                {#                        </li>#}
+                {#                        <li><a href="{% url 'db_metadata' %}">数据库字典</a></li>#}
+                {#                    </ul>#}
+                {#                </li>#}
+                <li><a><i class="fa fa-desktop"></i> Asset management <span class="fa fa-chevron-down"></span></a>
+                    <ul class="nav child_menu">
+
+                        {#                        <li><a href="{% url 'server_info' %}">虚拟机管理</a></li>#}
+                        {#                        <li><a href="{% url 'cloud_asset_list' %}">公有云管理</a></li>#}
+                        <li><a href="{% url 'domain_list' %}">Domain management</a></li>
+                    </ul>
+                </li>
+
+                <li><a><i class="fa fa-user"></i> User Management <span class="fa fa-chevron-down"></span></a>
+                    <ul class="nav child_menu">
+                        {#                        <li><a href="{% url 'user_list' %}">查看用户</a>#}
+                        {#                            <ul class="nav child_menu">#}
+                        {#                                <li class="sub_menu" style="display: none"><a#}
+                        {#                                        href="{% url 'user_add' %}">新增用户</a>#}
+                        {#                                </li>#}
+                        {#                            </ul>#}
+                        {#                        </li>#}
+                    </ul>
+                </li>
+                {#                <li><a><i class="fa fa-bars"></i> salt管理 <span class="fa fa-chevron-down"></span></a>#}
+                {#                    <ul class="nav child_menu">#}
+                {#                        <li><a href="{% url 'salt_key_list' %}">salt主机列表</a></li>#}
+                {#                        <li><a href="{% url 'salt_group_list' %}">salt分组管理</a>#}
+                {#                        <li><a href="{% url 'task_list' %}">任务列表</a></li>#}
+                {#                        <li><a href="{% url 'task_check' %}">salt任务查询</a></li>#}
+                {#                        <li><a href="{% url 'task_running' %}">存活任务</a></li>#}
+                {#                    </ul>#}
+                {#                </li>#}
+
+                {#                <li><a><i class="fa fa-arrows"></i> 日志审计 <span class="fa fa-chevron-down"></span></a>#}
+                {#                    <ul class="nav child_menu">#}
+                {#                        <li><a href="{% url 'log_audit' %}">操作日志</a></li>#}
+                {#                    </ul>#}
+                {#                </li>#}
+
+            </ul>
+        </div>
+
+    </div>
+    <!-- /sidebar menu -->
+
+    <!-- /menu footer buttons -->
+    <div class="sidebar-footer hidden-small">
+        <a data-toggle="tooltip" data-placement="top" title="Settings">
+            <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
+        </a>
+        <a data-toggle="tooltip" data-placement="top" title="FullScreen">
+            <span class="glyphicon glyphicon-fullscreen" aria-hidden="true"></span>
+        </a>
+        <a data-toggle="tooltip" data-placement="top" title="Lock">
+            <span class="glyphicon glyphicon-eye-close" aria-hidden="true"></span>
+        </a>
+        <a data-toggle="tooltip" data-placement="top" title="Logout" href="login.html">
+            <span class="glyphicon glyphicon-off" aria-hidden="true"></span>
+        </a>
+    </div>
+    <!-- /menu footer buttons -->
+</div>

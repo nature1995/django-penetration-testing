@@ -1,0 +1,213 @@
+{% extends 'base/base.html' %}
+{% block title %} 资源列表 {% endblock title %}
+{% block stylesheets %}
+    <link href="/static/webssh/css/xterm.min.css" rel="stylesheet" type="text/css"/>
+    <link href="/static/webssh/css/fullscreen.min.css" rel="stylesheet" type="text/css"/>
+    {{ block.super }}
+{% endblock %}
+{% block content %}
+    <div class="right_col" role="main">
+        <div class="">
+            <div class="clearfix"></div>
+
+            <div class="row">
+                <div class="col-md-12 col-sm-12 col-xs-12">
+                    <div class="x_panel">
+
+                        <form class="form-horizontal form-border" method="get" action="" name="formName">
+                            <div class="info">
+                                <a href="{% url 'server_add' %}" class="btn btn-info btn-sm" role="button"
+                                   {% if not perms.asset.edit_asset %}disabled{% endif %}>Add资产</a>
+                                <a href="{% url 'server_info' %}?action=flush" class="btn btn-info btn-sm" role="button"
+                                   {% if not perms.asset.edit_asset %}disabled{% endif %}>刷新salt资产信息</a>
+                                {% comment %}
+                                <button type="submit" class="btn btn-info btn-sm" name="export" value="check">导出
+                                </button>
+                                <button type="submit" class="btn btn-info btn-sm" name="export" value="check_all">全部导出
+                                </button>{% endcomment %}
+                            </div>
+                        </form>
+                    </div>
+                    <div class="x_content table-responsive" style="border:none">
+                        <div class="ln_solid"></div>
+                        <table id="datatable" class="table table-striped table-bordered">
+                            <thead>
+                            <tr>
+                                <th><input type="checkbox" name="alls" onClick="selectAll('formName','id')"
+                                           title="全选/反选">
+                                </th>
+                                <th>详细</th>
+                                <th>主机名</th>
+                                {#                                <th>内网IP</th>#}
+                                <th>外网IP</th>
+                                <th>规格</th>
+                                <th>操作系统</th>
+                                <th>状态</th>
+                                <th>云供应商</th>
+                                <th>负责人</th>
+                                <th>操作</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for server in all_server %}
+                                <tr id="{{ server.pk }}">
+                                    <td><input class="icheck" type="checkbox" value="{{ server.pk }}" name="id"></td>
+                                    <td><a href="{% url 'server_info' %}?aid={{ server.pk }}"><i
+                                            class="fa fa-envelope"></i></a>
+                                    </td>
+                                    <td>{{ server.hostname }}</td>
+                                    <td>{{ server.public_ip }}</td>
+                                    <td>{{ server.size }}</td>
+                                    <td>{{ server.os }}</td>
+                                    <td>{{ server.status }}</td>
+                                    <td>{{ server.region }}|{{ server.region.get_provider_display }}</td>
+                                    <td>{{ server.owner }}</td>
+                                    {% if perms.asset.edit_asset %}
+                                        <td>
+                                            <a href="{% url 'server_manage' aid=server.pk action='edit' %}"
+                                               class="btn btn-success btn-xs" role="button">Edit</a>
+                                            <a href="#" data-toggle="modal"
+                                               data-target="#reqDelete-{{ server.pk }}"
+                                               class="btn btn-danger btn-xs" role="button">Delete</a>
+                                            <a type="button" class="btn btn-primary btn-xs webssh">终端</a>
+                                        </td>
+                                    {% endif %}
+                                    <div class="modal fade" id="reqDelete-{{ server.pk }}"
+                                         tabindex="-1" role="dialog" aria-labelledby="reqDelete"
+                                         aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <button type="button" class="close" data-dismiss="modal"
+                                                            aria-hidden="true">&times;
+                                                    </button>
+                                                    <h4 class="modal-title" id="reqDelete">Prompt</h4>
+                                                </div>
+                                                <div class="modal-body">
+                                                    Are you sure to delete?？
+                                                    <div><br/><strong>{{ server.hostname }}</strong></p>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-default btn-sm"
+                                                            data-dismiss="modal">Close
+                                                    </button>
+                                                    <a style="margin:4px;" class="btn btn-danger btn-sm"
+                                                       href="{% url 'server_manage' aid=server.pk action='delete' %}">Delete</a>
+                                                </div>
+                                            </div><!-- /.modal-content -->
+                                        </div><!-- /.modal-dialog -->
+                                    </div><!-- /.modal -->
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+{% block javascripts %}
+    <script src="/static/webssh/js/xterm.min.js"></script>
+    <script src="/static/webssh/js/fullscreen.min.js"></script>
+{#    <script src="/static/vendors/sweetalert/sweetalert.min.js"></script>#}
+    {{ block.super }}
+    <script>
+        jQuery(function ($) {
+            $(document).on('click', '.webssh', function (event) {
+
+
+                event.preventDefault();
+
+                var id_a = $(this).parent().parent().attr('id');
+
+                $.ajax({
+                    headers: {"X-CSRFToken": '{{ csrf_token }}'},
+                    url: "{% url 'asset_web_ssh' %}",
+                    type: 'POST',
+                    data: {'id': id_a},
+                    success: function (ret) {
+
+                        var obj = JSON.parse(ret);
+                        var ips = obj.ip;
+                        var ports = obj.port;
+                        var usernames = obj.username;
+                        var passwords = obj.password;
+
+                        $.ajax({
+                            url: "http://127.0.0.1:9000/",
+                            type: 'POST',
+                            data: {hostname: ips, port: ports, username: usernames, password: passwords},
+                            crossDomain: true,
+                            success: callback
+                        });
+
+                        function current_geometry() {
+                            cols = parseInt(window.innerWidth / 10);
+                            rows = parseInt(window.innerHeight / 24);
+                            return [cols, rows];
+                        }
+
+
+                        function callback(msg) {
+                            console.log(msg);
+                            if (msg.status) {
+                                alert("遇到错误:" + "[ " + msg.status + " ]" );
+                                // swal("错误", "登陆" + "[ " + msg.status + " ]" + "遇到错误", "error");
+                                return;
+                            }
+
+
+                            var    url = "ws://127.0.0.1:9000/" + 'ws?id=' + msg.id,
+                                socket = new WebSocket(url),
+                                terminal = document.getElementById('#terminal'),
+                                geometry = current_geometry();
+                            term = new Terminal({cursorBlink: true, cols: geometry[0], rows: geometry[1]});
+
+                            console.log(url);
+                            term.on('data', function (data) {
+                                // console.log(data);
+                                socket.send(data);
+                            });
+
+                            socket.onopen = function (e) {
+                                $('.container1').hide();
+                                term.open(terminal, true);
+                                term.toggleFullscreen(true);
+                            };
+
+                            socket.onmessage = function (msg) {
+                                console.log(msg);
+                                term.write(msg.data);
+                            };
+
+                            socket.onerror = function (e) {
+                                console.log(e);
+                            };
+
+                            socket.onclose = function (e) {
+                                console.log(e);
+                                term.destroy();
+                                $('.container1').show();
+                                // status.text(e.reason);
+                            };
+                        }
+
+
+                        $(window).resize(function () {
+                            if (typeof term != "undefined") {
+                                geometry = current_geometry();
+                                term.geometry = geometry;
+                                term.resize(geometry[0], geometry[1]);
+                            }
+                        });
+
+                    }
+                });
+            });
+        });
+    </script>
+{% endblock %}

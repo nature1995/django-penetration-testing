@@ -1,0 +1,164 @@
+{% extends 'base/base.html' %}
+{#{% load myinclusion %}#}
+{% block stylesheets %}
+  {{ block.super }}
+  <link href="/static/others/css/bootstrapValidator.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/static/vendors/bootstrap-select/css/bootstrap-select.min.css">
+  <!-- iCheck -->
+{% endblock %}
+{% block content %}
+  <div class="right_col" role="main">
+    <div class="">
+      <div class="clearfix"></div>
+
+      <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+          <div class="tabbable" id="tabs-754998">
+
+            <div class="x_panel" style="border-top:none;">
+              <div class="x_title">
+                <h2>Black List </h2>
+                <ul class="nav navbar-right panel_toolbox">
+                  <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                  </li>
+                  <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                       aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                    <ul class="dropdown-menu" role="menu">
+                      <li><a href="#">Settings 1</a>
+                      </li>
+                      <li><a href="#">Settings 2</a>
+                      </li>
+                    </ul>
+                  </li>
+                  <li><a class="close-link"><i class="fa fa-close"></i></a>
+                  </li>
+                </ul>
+                <div class="clearfix"></div>
+              </div>
+              <div class="x_content">
+                <div class="loading"></div>
+                <div class="tab-content">
+                  <div class="tab-pane active" id="panel-single">
+                    <form class="form-horizontal form-border" enctype="multipart/form-data"
+                          method="post">
+
+                      {% csrf_token %}
+                      {#                                            {% if perms.deploy.edit_deploy %}#}
+                      {#                                                <fieldset>#}
+                      {#                                            {% else %}#}
+                      {#                                                <fieldset disabled="disabled">#}
+                      {#                                            {% endif %}#}
+                      <div class="item form-group">
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12">FEED <span
+                            class="required">*</span>
+                        </label>
+                        <div class="col-md-6 col-sm-6 col-xs-12 form-group">
+                          <select id="feed_tgt_select" name="feed_tgt_select[]"
+                                  class=" selectpicker show-menu-arrow form-control"
+                                  data-selected-text-format="count"
+                                  data-live-search="true">
+                            {% for feed in feed_list %}
+                              <option value="{{ feed }}">
+                                {{ feed }}</option>
+                            {% endfor %}
+                          </select>
+                        </div>
+                      </div>
+                      {#                                            <div class="item form-group">#}
+                      {#                                                <label class="control-label col-md-3 col-sm-3 col-xs-12">返回结果#}
+                      {#                                                </label>#}
+                      {#                                                <div class="col-md-6 col-sm-6 col-xs-12">#}
+                      {#                                                    <textarea class="form-control" name="result"#}
+                      {#                                                              rows="10">{{ result }}</textarea>#}
+                      {#                                                </div>#}
+                      {#                                            </div>#}
+
+                      <div class="col-md-6 col-md-offset-3">
+                        {#                                                                                                   <input type="submit" name="send" class="btn btn-success" value="提交">#}
+                        <span class="esingle">
+                            <button class="btn btn-success" type="submit">Run</button>
+                        </span>
+                        {#                                                    <a href="#" onclick="show_result();" role="button"#}
+                        {#                                                       class="btn btn-info">查看结果</a>#}
+                      </div>
+
+                      </fieldset>
+                    </form>
+                  </div>
+
+                </div>
+                <div class="col-md-12 col-sm-12 col-xs-12">
+                  <div class="x_panel">
+                    <div class="x_title">
+                      <h2>Blacklist information results</h2>
+                      <div class="clearfix"></div>
+                    </div>
+                    <div class="x_content">
+
+                      <div class="ibox float-e-margins">
+                        <div class="ibox-content">
+                          <textarea class="form-control" name="result" rows="10">{% for res in result %} {{ res }}&#10{% endfor %}
+                          </textarea>
+                          {#                                                        <pre id="output_append"></pre>#}
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="result"></div>
+          <!-- 模态框（Modal） -->
+          <div class="modal fade" id="result-modal-salt" tabindex="-1" role="dialog"
+               aria-labelledby="result-modal" aria-hidden="true">
+            <div class="modal-loading"></div>
+            <div class="modal-dialog">
+              <div class="modal-content" style="background-color:#272822;color:#00ff00;">
+                <div class="modal-header" style="border-bottom:1px solid #666">
+                  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                    &times;
+                  </button>
+                  <b class="modal-title" id="result-modal" style="color:#f8f8f2">Result</b>&nbsp;
+                  <a href="#" role="button"
+                     class="btn btn-dark btn-xs">Search again</a>
+                  <a href="#" onclick="collapse(this);" state="0" role="button"
+                     class="btn btn-dark btn-xs">Expand all</a>
+                </div>
+                <div id="modal-body" class="modal-body">
+                  <div class="panel-group" id="accordion">
+                  </div>
+                </div>
+                <!--<div class="modal-footer">
+
+                </div>-->
+              </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+          </div><!-- /.modal -->
+
+          <input type="hidden" class="form-control" value="" id="jid">
+          <input type="hidden" class="form-control" value="" id="exec_type">
+
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block javascripts %}
+  {{ block.super }}
+  <script src="/static/others/js/bootstrapValidator.min.js"></script>
+  <script src="/static/vendors/bootstrap-select/js/bootstrap-select.min.js"></script>
+  <script>
+      $(document).ready(function () {
+          $('.selectpicker').selectpicker({
+              noneSelectedText: '======请选择=====' //默认显示内容
+          });
+
+      });
+
+  </script>
+{% endblock %}
