@@ -9,6 +9,8 @@ from urllib import request as r
 import re
 import subprocess
 from urllib.error import HTTPError
+from django.contrib.auth.decorators import login_required
+
 
 headers = {
     'User-Agent': r'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) '
@@ -16,6 +18,7 @@ headers = {
 }
 
 
+@login_required(login_url="login")
 def who_is(request, action=None):
     if request.method == 'POST':
 
@@ -131,6 +134,7 @@ def identify_web(request):
     return HttpResponse('identify web')
 
 
+@login_required(login_url="login")
 def ip_blacklist(request):
     feed_list = ['NEU IP Blacklist', 'Firehol IP Blacklist', 'Cisco Talos']
     page_name = 'IP blacklist'

@@ -6,14 +6,17 @@ from asset.models import *
 from asset.forms import *
 from django.conf import settings
 from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required
 
 
+@login_required(login_url="login")
 def domain_list(request):
     # 定义域名列表
     domainlist = DomainList.objects.all()
     return render(request, 'asset/asset_domain_list.html', {'DomainList': domainlist})
 
 
+@login_required(login_url="login")
 def domain_manage(request, aid=None, action=None):
     # 定义域名新建和删除页面
     page_name = 'Domain manage'

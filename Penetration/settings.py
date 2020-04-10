@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'info',
     'asset',
     'whois',
+    'captcha',
 ]
 
 MIDDLEWARE = [

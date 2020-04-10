@@ -1,0 +1,111 @@
+{% extends "base/base.html" %}
+{% load static %}
+<body class="{% block body_class %}nav-md {% endblock body_class %}">
+{% block body %}
+  <div class="container body">
+    <div class="main_container">
+
+      {% block sidebar %}
+        <div class="col-md-3 left_col {% block sidebar_class %} {% endblock sidebar_class %}">
+          <div class="left_col scroll-view">
+            <div class="navbar nav_title" style="border: 0;">
+                <a href="/" class="site_title"><i class="fa fa-star"></i> <span>Penetration Test</span></a>
+            </div>
+
+            <div class="clearfix"></div>
+          </div>
+        </div>
+      {% endblock sidebar %}
+
+      {% block top_navigation %}
+        <div class="top_nav">
+          <div class="nav_menu">
+            <nav>
+              <ul class="nav navbar-nav navbar-right">
+                <li class="">
+                  <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown"
+                     aria-expanded="false">
+                    <img src="/static/images/img.jpg" alt="">{{ request.user.username }}
+                    <span class=" fa fa-angle-down"></span>
+                  </a>
+                  <ul class="dropdown-menu dropdown-usermenu pull-right">
+                    {% if user.is_authenticated %}
+                      <li><a href="javascript:;">Profile</a></li>
+                      <li><a href="{% url 'logout' %}">Logout</a></li>
+                    {% else %}
+                      <li><a href="{% url 'login' %}">Login</a></li>
+                    {% endif %}
+                  </ul>
+                </li>
+
+              </ul>
+            </nav>
+          </div>
+        </div>
+      {% endblock top_navigation %}
+
+      {% block content %}
+        <section>
+          <div class="c-box bg-box">
+            <div class="login-box clearfix">
+              <div class="hd-login clearfix">
+                <h1>User login</h1>
+                <a class="index-font" href="{% url 'index' %}">Back home</a>
+              </div>
+              <div class="fl slide">
+                  <a href=""><img style="position:relative; width:440px; height:472px" src="{% static 'images/register2.png' %}"/></a>
+              </div>
+              <div class="fl form-box">
+                <h2>Account login</h2>
+                <form action="{% url 'login' %}" method="post" autocomplete="off">
+                  <div class="form-group marb20 {% if login_form.username.errors %} errorput{% endif %}">
+                    <label>Username</label>
+                    <input name="username" id="account_l" type="text" placeholder="Username/Email"/>
+                  </div>
+                  <div class="form-group marb8 {% if login_form.password.errors %} errorput{% endif %}">
+                    <label>Password</label>
+                    <input name="password" id="password_l" type="password" placeholder="please enter your password"/>
+                  </div>
+                  <div class="error btns login-form-tips" id="jsLoginTips">
+                    {% for key, error in login_form.errors.items %}
+                      {{ error }}
+                    {% endfor %}
+                    {{ msg }}</div>
+                  <input class="btn btn-green" id="jsLoginBtn" type="submit" value="Login"/>
+                  <input type="hidden" name="next" value="{{ redirect_url }}"/>
+                  {% csrf_token %}
+                </form>
+                <p class="form-p">No account for this website？<a href="{% url 'register' %}">Register</a></p>
+              </div>
+            </div>
+          </div>
+        </section>
+      {% endblock content %}
+
+      {% block footer %}
+
+      {% endblock footer %}
+    </div>
+  </div>
+
+    <!-- jQuery -->
+    <script src="/static/vendors/jquery/jquery.min.js"></script>
+    <!-- Bootstrap -->
+    <script src="/static/vendors/bootstrap/js/bootstrap.min.js"></script>
+
+    <!-- bootstrap-daterangepicker -->
+    <script src="/static/vendors/moment/moment.min.js"></script>
+    <script src="/static/vendors/bootstrap-daterangepicker/daterangepicker.js"></script>
+    <!-- datatable -->
+    <script src="/static/vendors/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="/static/vendors/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+    {% block javascripts %}
+    {% endblock javascripts%}
+    <!-- Custom Theme Scripts -->
+    <script src="/static/custom/js/custom.js"></script>
+    <script src="{% static '/custom/js/unslider.js' %}" type="text/javascript"></script>
+    <script src="{% static '/custom/js/login.js' %}"  type="text/javascript"></script>
+{% endblock body %}
+</body>
+
+</html>

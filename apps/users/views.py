@@ -1,18 +1,23 @@
 import random
+import json
 
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.urls import reverse
+from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
-from django.contrib.auth import get_user_model
+# Django自带的用户验证,login
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.backends import ModelBackend
+# 并集运算
 from django.db.models import Q
-from rest_framework import status
-from rest_framework import viewsets, permissions, authentication, mixins
-from rest_framework.response import Response
-from rest_framework_simplejwt.tokens import AccessToken
-from rest_framework_simplejwt.authentication import JWTAuthentication
+# 基于类实现需要继承的view
+from django.views.generic.base import View
 
-from users.serializers import UserRegSerializer, UserDetailSerializer
-
-User = get_user_model()
+from .forms import LoginForm, RegisterForm
+from .models import UserProfile
+# 进行密码加密
+from django.contrib.auth.hashers import make_password
+from django.contrib.auth.decorators import login_required
 # Create your views here.
 
 
@@ -24,7 +29,7 @@ class CustomBackend(ModelBackend):
         try:
             # 不希望用户存在两个，get只能有一个。两个是get失败的一种原因
             # 后期可以添加邮箱验证
-            user = User.objects.get(
+            user = UserProfile.objects.get(
                 Q(username=username) | Q(mobile=username))
             # django的后台中密码加密：所以不能password==password
             # UserProfile继承的AbstractUser中有def check_password(self,
@@ -35,62 +40,119 @@ class CustomBackend(ModelBackend):
             return None
 
 
-class UserViewset(mixins.CreateModelMixin, mixins.UpdateModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
-    """
-    User
-    """
-    serializer_class = UserRegSerializer
-    queryset = User.objects.all()
-    authentication_classes = (JWTAuthentication, authentication.SessionAuthentication)
-    # permission_classes = (permissions.IsAuthenticated, )
-
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        user = self.perform_create(serializer)
-        re_dict = serializer.data
-
-        # 生成注册用户的Token
-        re_dict["token"] = str(AccessToken.for_user(user))
-        re_dict["name"] = user.name if user.name else user.username
-
-        headers = self.get_success_headers(serializer.data)
-
-        return Response(re_dict, status=status.HTTP_201_CREATED, headers=headers)
-
-    # 这里需要动态选择用哪个序列化方式
-    # 1.UserRegSerializer（用户注册），只返回username和mobile，会员中心页面需要显示更多字段，所以要创建一个UserDetailSerializer
-    # 2.问题又来了，如果注册的使用UserDetailSerializer，又会导致验证失败，所以需要动态的使用serializer
-    def get_serializer_class(self):
-        if self.action == "retrieve":
-            return UserDetailSerializer
-        elif self.action == "create":
-            return UserRegSerializer
-
-        return UserDetailSerializer
-
-    # 这里需要动态权限配置
-    # 1.用户注册的时候不应该有权限限制
-    # 2.当想获取用户详情信息的时候，必须登录才行
-    def get_permissions(self):
-        if self.action == "retrieve":
-            return [permissions.IsAuthenticated()]
-        elif self.action == "create":
-            return []
-
-        return []
-
-    # 虽然继承了Retrieve可以获取用户详情，但是并不知道用户的id，所有要重写get_object方法
-    # 重写get_object方法，就知道是哪个用户了
-    def get_object(self):
-        return self.request.user
-
-    def perform_create(self, serializer):
-        return serializer.save()
+class LogoutView(View):
+    def get(self, request):
+        # django自带的logout
+        logout(request)
+        # 重定向到首页,
+        return HttpResponseRedirect(reverse("login"))
 
 
+class LoginView(View):
+    # 直接调用get方法免去判断
+    def __init__(self):
+        super(LoginView, self).__init__()
+        self.page_name = 'Login'
+
+    def get(self, request):
+        # render就是渲染html返回用户
+        # render三变量: request 模板名称 一个字典写明传给前端的值
+        redirect_url = request.GET.get('next', '')
+        return render(request, "login.html", {"redirect_url": redirect_url, "page_name": self.page_name})
+
+    def post(self, request):
+        # 类实例化需要一个字典参数dict:request.POST就是一个QueryDict所以直接传入
+        # POST中的usernamepassword，会对应到form中
+        login_form = LoginForm(request.POST)
+
+        # is_valid判断我们字段是否有错执行我们原有逻辑，验证失败跳回login页面
+        if login_form.is_valid():
+            # 取不到时为空，username，password为前端页面name值
+            user_name = request.POST.get("username", "")
+            pass_word = request.POST.get("password", "")
+
+            # 成功返回user对象,失败返回null
+            user = authenticate(username=user_name, password=pass_word)
+
+            # 如果不是null说明验证成功
+            if user is not None:
+                # 只有当用户激活时才给登录
+                if user.is_active:
+                    # login_in 两参数：request, user
+                    # 实际是对request写了一部分东西进去，然后在render的时候：
+                    # request是要render回去的。这些信息也就随着返回浏览器。完成登录
+                    login(request, user)
+                    # 跳转到首页 user request会被带回到首页
+                    # 增加重定向回原网页。
+                    redirect_url = request.POST.get('next', '')
+                    if redirect_url:
+                        return HttpResponseRedirect(redirect_url)
+                    # 跳转到首页 user request会被带回到首页
+                    return HttpResponseRedirect(reverse("index"))
+                # 即用户未激活跳转登录，提示未激活
+                else:
+                    return render(
+                        request, "login.html", {"msg": "Username is not activated! Please go to the mailbox to activate", "page_name": self.page_name})
+            # 仅当用户真的密码出错时
+            else:
+                return render(request, "login.html", {"msg": "Wrong user name or password!"})
+        # 验证不成功跳回登录页面
+        # 没有成功说明里面的值是None，并再次跳转回主页面
+        else:
+            return render(
+                request, "login.html", {"login_form": login_form, "page_name": self.page_name})
+
+
+class RegisterView(View):
+    """注册功能的view"""
+    # get方法直接返回页面
+
+    def get(self, request):
+        # 添加验证码
+        register_form = RegisterForm()
+        return render(
+            request, "register.html", {
+                'register_form': register_form})
+
+    def post(self, request):
+        # 实例化form
+        register_form = RegisterForm(request.POST)
+        if register_form.is_valid():
+            # 这里注册时前端的name为email
+            user_name = request.POST.get("email", "")
+            # 用户查重
+            if UserProfile.objects.filter(email=user_name):
+                return render(
+                    request, "register.html", {
+                        "register_form": register_form, "msg": "用户已存在"})
+            pass_word = request.POST.get("password", "")
+
+            # 实例化一个user_profile对象，将前台值存入
+            user_profile = UserProfile()
+            user_profile.username = user_name
+            user_profile.email = user_name
+
+            # 默认激活状态为True
+            user_profile.is_active = True
+
+            # 加密password进行保存
+            user_profile.password = make_password(pass_word)
+            user_profile.save()
+
+            # 跳转到登录页面
+            return render(request, "login.html", )
+        # 注册邮箱form验证失败
+        else:
+            return render(
+                request, "register.html", {
+                    "register_form": register_form})
+
+
+@login_required(login_url="login")
 def index(request):
+    user_num = len(UserProfile.objects.all())
     data = {
-        'page_name': 'Dash board'
+        'page_name': 'Dash board',
+        'user_num': user_num,
     }
     return render(request, 'index.html', data)

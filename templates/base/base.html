@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+{% load static %}
 <head>
     {% block head %}
         {% block meta %}
@@ -24,6 +25,8 @@
         <link href="/static/vendors/datatables.net-bs/css/dataTables.bootstrap.min.css" rel="stylesheet">
         <!-- Custom Theme Style -->
         <link href="/static/custom/css/custom.css" rel="stylesheet">
+      	<link rel="stylesheet" type="text/css" href="{% static '/custom/css/reset.css' %}">
+	      <link rel="stylesheet" type="text/css" href="{% static '/custom/css/login.css' %}">
         {% block stylesheets %}
         {% endblock stylesheets %}
         <!-- Custom Theme Style -->
@@ -53,9 +56,6 @@
             {% endblock content %}
 
             {% block footer %}
-                <footer>
-                    {% include "base/footer.html" %}
-                </footer>
             {% endblock footer %}
         </div>
     </div>
@@ -73,7 +73,7 @@
     <script src="/static/vendors/datatables.net/js/jquery.dataTables.min.js"></script>
     <script src="/static/vendors/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
     {% block javascripts %}
-    {% endblock %}
+    {% endblock javascripts%}
     <!-- Custom Theme Scripts -->
     <script src="/static/custom/js/custom.js"></script>
 {% endblock body %}
