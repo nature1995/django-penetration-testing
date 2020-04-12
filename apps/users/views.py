@@ -13,7 +13,7 @@ from django.db.models import Q
 # 基于类实现需要继承的view
 from django.views.generic.base import View
 
-from .forms import LoginForm, RegisterForm
+from .forms import LoginForm, RegisterForm, UserInfoForm
 from .models import UserProfile
 # 进行密码加密
 from django.contrib.auth.hashers import make_password
@@ -105,14 +105,15 @@ class LoginView(View):
 
 class RegisterView(View):
     """注册功能的view"""
-    # get方法直接返回页面
+    def __init__(self):
+        super(RegisterView, self).__init__()
+        self.page_name = 'Registration'
 
+    # get方法直接返回页面
     def get(self, request):
         # 添加验证码
         register_form = RegisterForm()
-        return render(
-            request, "register.html", {
-                'register_form': register_form})
+        return render(request, "register.html", {'register_form': register_form, "page_name": self.page_name})
 
     def post(self, request):
         # 实例化form
@@ -122,9 +123,7 @@ class RegisterView(View):
             user_name = request.POST.get("email", "")
             # 用户查重
             if UserProfile.objects.filter(email=user_name):
-                return render(
-                    request, "register.html", {
-                        "register_form": register_form, "msg": "用户已存在"})
+                return render(request, "register.html", {"register_form": register_form, "msg": "User already exists"})
             pass_word = request.POST.get("password", "")
 
             # 实例化一个user_profile对象，将前台值存入
@@ -140,12 +139,33 @@ class RegisterView(View):
             user_profile.save()
 
             # 跳转到登录页面
-            return render(request, "login.html", )
+            return render(request, "login.html")
         # 注册邮箱form验证失败
         else:
             return render(
-                request, "register.html", {
-                    "register_form": register_form})
+                request, "register.html", {"register_form": register_form})
+
+
+class UserInfoView(LoginRequiredMixin, View):
+    login_url = '/login/'
+    redirect_field_name = 'next'
+
+    def __init__(self):
+        super(UserInfoView, self).__init__()
+        self.page_name = 'Profile'
+
+    def get(self, request):
+        return render(request, "user_info.html", {"page_name": self.page_name})
+
+    def post(self, request):
+        # 不像用户咨询是一个新的。需要指明instance。不然无法修改，而是新增用户
+        user_info_form = UserInfoForm(request.POST, instance=request.user)
+        if user_info_form.is_valid():
+            user_info_form.save()
+            return HttpResponse('{"status":"success"}', content_type='application/json')
+        else:
+            # 通过json的dumps方法把字典转换为json字符串
+            return HttpResponse(json.dumps(user_info_form.errors), content_type='application/json')
 
 
 @login_required(login_url="login")

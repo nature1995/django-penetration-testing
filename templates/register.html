@@ -1,4 +1,4 @@
-{% extends "base/base.html" %}
+{% extends "base/user_base.html" %}
 {% load static %}
 <body class="{% block body_class %}nav-md {% endblock body_class %}">
 {% block body %}
@@ -30,7 +30,7 @@
                   </a>
                   <ul class="dropdown-menu dropdown-usermenu pull-right">
                     {% if user.is_authenticated %}
-                      <li><a href="javascript:;">Profile</a></li>
+                      <li><a href="{% url 'users:user_info' %}">Profile</a></li>
                       <li><a href="{% url 'logout' %}">Logout</a></li>
                     {% else %}
                       <li><a href="{% url 'login' %}">Login</a></li>
@@ -46,7 +46,7 @@
 
       {% block content %}
         <section>
-          <div class="c-box bg-box">
+          <div class="c-box">
             <div class="login-box clearfix">
               <div class="hd-login clearfix">
                 <h1>User registation</h1>

@@ -83,7 +83,9 @@
     <!-- Chart.js -->
     <script src="/static/vendors/echarts/echarts.min.js"></script>
     <script type="text/javascript">
+        var change = Math.floor(Math.random() * 41);
         // 基于准备好的dom，初始化echarts实例
+
         var myChart = echarts.init(document.getElementById('main'));
         var myChart2 = echarts.init(document.getElementById('main2'));
 
@@ -110,11 +112,11 @@
                     radius: '55%',
                     center: ['50%', '60%'],
                     data: [
-                        {value: 335, name: 'Direct access'},
-                        {value: 310, name: 'Email marketing'},
-                        {value: 234, name: 'Image advertising '},
-                        {value: 135, name: 'Video advertising'},
-                        {value: 1548, name: 'search engine'}
+                        {value: 335-change, name: 'Direct access'},
+                        {value: 310+change, name: 'Email marketing'},
+                        {value: 234-change, name: 'Image advertising '},
+                        {value: 135+change, name: 'Video advertising'},
+                        {value: 1500-change, name: 'search engine'}
                     ],
                     itemStyle: {
                         emphasis: {
@@ -129,6 +131,7 @@
 
         // 柱图
         var option_bar = {
+
             title: {
                 text: 'Machine distribution'
             },
@@ -143,7 +146,7 @@
             series: [{
                 name: 'Sales',
                 type: 'bar',
-                data: [5, 20, 36, 10, 10, 20]
+                data: [1+change, 10+change, 16+change, 10+change, 10+change, 20+change]
             }]
         };
 
@@ -178,7 +181,7 @@
                     type: 'value'
                 },
                 series: [{
-                    data: [820, 932, 901, 934, 1290, 1330, 1320],
+                    data: [820-4*change, 932+change, 901+2*change, 934+2*change, 1290+change, 1330-2*change, 1320+2*change],
                     type: 'line'
                 }]
             };

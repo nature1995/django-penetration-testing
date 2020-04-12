@@ -32,6 +32,7 @@ def who_is(request, action=None):
         return render(request, 'info/who_is.html')
 
 
+@login_required(login_url="login")
 def subdomain_scan(request):
     if request.method == 'POST':
         target = request.POST.get('id_tgt_select[]')
@@ -50,6 +51,7 @@ def subdomain_scan(request):
         return render(request, 'info/subdomain_scan.html', data)
 
 
+@login_required(login_url="login")
 def port_scan(request):
     if request.method == 'POST':
 
@@ -126,10 +128,12 @@ def port_scan(request):
         return render(request, 'info/port_scan.html', data)
 
 
+@login_required(login_url="login")
 def namp_result(request):
     return render(request, 'nmap/info.html')
 
 
+@login_required(login_url="login")
 def identify_web(request):
     return HttpResponse('identify web')
 

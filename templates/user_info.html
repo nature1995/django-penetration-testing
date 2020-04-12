@@ -47,37 +47,34 @@
       {% block content %}
         <section>
           <div class="c-box">
-            <div class="login-box clearfix">
-              <div class="hd-login clearfix">
-                <h1>User login</h1>
-                <a class="index-font" href="{% url 'index' %}">Back home</a>
-              </div>
-              <div class="fl slide">
-                  <a href=""><img style="position:relative; width:440px; height:472px" src="{% static 'images/register2.png' %}"/></a>
-              </div>
-              <div class="fl form-box">
-                <h2>Account login</h2>
-                <form action="{% url 'login' %}" method="post" autocomplete="off">
-                  <div class="form-group marb20 {% if login_form.username.errors %} errorput{% endif %}">
-                    <label>Username</label>
-                    <input name="username" id="account_l" type="text" placeholder="Username/Email"/>
-                  </div>
-                  <div class="form-group marb8 {% if login_form.password.errors %} errorput{% endif %}">
-                    <label>Password</label>
-                    <input name="password" id="password_l" type="password" placeholder="please enter your password"/>
-                  </div>
-                  <div class="error btns login-form-tips" id="jsLoginTips">
-                    {% for key, error in login_form.errors.items %}
-                      {{ error }}
-                    {% endfor %}
-                    {{ msg }}</div>
-                  <input class="btn btn-green" id="jsLoginBtn" type="submit" value="Login"/>
-                  <input type="hidden" name="next" value="{{ redirect_url }}"/>
-                  {% csrf_token %}
-                </form>
-                <p class="form-p">No account for this website？<a href="{% url 'register' %}">Register</a></p>
-              </div>
-            </div>
+            <div class="profile-box">
+
+              <form role="form" autocomplete="off">
+                <ul class="right">
+                  <li>Username:
+                    <input type="text" name="username" id="username"
+                       value="{{ request.user.username|default_if_none:'' }}" maxlength="10">
+                    <i class="error-tips"></i>
+                  </li>
+                  <li>Birthday:&nbsp;&nbsp;&nbsp;
+                    <input type="text" id="birth_day" name="birthday" value="{{ request.user.birthday|date:'Y-m-d' }}"
+                           readonly="readonly"/>
+                    <i class="error-tips"></i>
+                  </li>
+                  <li>Gender:
+                    <label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="radio" name="gender" value="male"
+                                                                {% ifequal request.user.gender "male" %}checked="checked"{% endifequal %}>Male</label>
+                    <label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="radio" name="gender" value="female"
+                                                                      {% ifequal request.user.gender "female" %}checked="checked"{% endifequal %}>Female</label>
+                  </li>
+                  <li>Email:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <input class="borderno" type="text" name="email" readonly="readonly" value="{{ request.user.email }}"/>
+                  </li>
+                </ul>
+                {% csrf_token %}
+              </form>
+              <a class="index-font" href="{% url 'index' %}">Back home</a>
+          </div>
           </div>
         </section>
       {% endblock content %}
