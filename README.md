@@ -10,7 +10,6 @@
 - [Introduction](#introduction)
 - [Architicture](#architicture)
 - [Usage](#usage)
-
 - [Result](#result)
 
 ## Introduction  
